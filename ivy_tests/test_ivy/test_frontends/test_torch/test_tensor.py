@@ -11620,3 +11620,57 @@ def test_torch_isnan(
         frontend=frontend,
         on_device=on_device,
     )
+
+
+@st.composite
+def _arrays_helper(draw):
+    dtype_x=draw(helpers.dtype_and_values(
+                    available_dtypes=helpers.get_dtypes("valid"),
+                    num_arrays=2,
+                ))
+    input_dtype, x = dtype_x
+    x = x[0]
+    other = draw(st.one_of(x[1], 
+                           st.integers(
+                                        min_value=1,
+                                        max_value=5,
+                                    ),
+                           st.floats(
+                                        min_value=-5,
+                                        max_value=5,
+                                    ),
+                        )
+                )
+
+    return input_dtype, x, other 
+
+# true_divide
+@handle_frontend_method(
+    class_tree=CLASS_TREE,
+    init_tree="torch.tensor",
+    method_name="true_divide",
+    dtype_x_other=_arrays_helper(),
+    
+)
+def test_torch_true_divide(
+    dtype_x_other,
+    frontend,
+    frontend_method_data,
+    init_flags,
+    method_flags,
+    on_device,
+    backend_fw,
+):
+    input_dtype, x, other = dtype_x_other
+    helpers.test_frontend_method(
+        init_input_dtypes=input_dtype,
+        backend_to_test=backend_fw,
+        init_all_as_kwargs_np={"data": x},
+        method_input_dtypes=input_dtype,
+        method_all_as_kwargs_np={"other": other},
+        frontend_method_data=frontend_method_data,
+        init_flags=init_flags,
+        method_flags=method_flags,
+        frontend=frontend,
+        on_device=on_device,
+    )
