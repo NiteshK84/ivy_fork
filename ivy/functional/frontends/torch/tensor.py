@@ -1691,8 +1691,23 @@ class Tensor:
         "torch",
     )
     def isnan(self):
-        return torch_frontend.isnan(self)
+        return torch_frontend.lcm(self)
 
+    @with_unsupported_dtypes(
+        {
+            "2.0.1 and below": (
+                "float16",
+                "bfloat16",
+                "uint16",
+                "bool",
+                "complex64",
+                "complex128",
+            )
+        },
+        "torch",
+    )
+    def index_copy(self, dim, index, tensor):
+        return torch_frontend.index_copy(self, dim, index, tensor)
 
 class Size(tuple):
     def __new__(cls, iterable=()):

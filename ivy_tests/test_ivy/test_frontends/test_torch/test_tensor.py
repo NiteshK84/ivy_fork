@@ -11620,3 +11620,57 @@ def test_torch_isnan(
         frontend=frontend,
         on_device=on_device,
     )
+
+
+# index_copy
+@handle_frontend_method(
+    class_tree=CLASS_TREE,
+    init_tree="torch.tensor",
+    method_name="index_copy",
+    dtype_indices_axis=helpers.array_indices_axis(
+        array_dtypes=helpers.get_dtypes("valid"),
+        indices_dtypes=["int64"],
+        min_num_dims=1,
+        max_num_dims=5,
+        min_dim_size=1,
+        max_dim_size=5,
+        first_dimension_only=True,
+        indices_same_dims=False,
+    ),
+    tensor=helpers.dtype_and_values(
+        available_dtypes=helpers.get_dtypes("valid"),
+        min_num_dims=1,
+        max_num_dims=5,
+        min_dim_size=1,
+        max_dim_size=5,
+    ),
+)
+def test_torch_index_copy(
+    dtype_indices_axis,
+    tensor,
+    frontend,
+    frontend_method_data,
+    init_flags,
+    method_flags,
+    on_device,
+    backend_fw,
+):
+    input_dtypes, x, indices, axis, _ = dtype_indices_axis
+    if indices.ndim != 1:
+        indices = ivy.flatten(indices)
+    helpers.test_frontend_method(
+        init_input_dtypes=input_dtypes,
+        backend_to_test=backend_fw,
+        init_all_as_kwargs_np={"data": tensor},
+        method_input_dtypes=input_dtypes,
+        method_all_as_kwargs_np={
+            "dim": axis,
+            "index": indices,
+            "tensor": x[0],
+            },
+        frontend_method_data=frontend_method_data,
+        init_flags=init_flags,
+        method_flags=method_flags,
+        frontend=frontend,
+        on_device=on_device,
+    )
