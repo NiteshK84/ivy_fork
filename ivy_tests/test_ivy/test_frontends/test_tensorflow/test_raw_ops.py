@@ -4345,3 +4345,32 @@ def test_tensorflow_Svd(
         atol=1e-2,
         ground_truth_backend=frontend,
     )
+
+
+# Const
+@handle_frontend_test(
+    fn_tree="tensorflow.raw_ops.Const",
+    dtype_and_x=helpers.dtype_and_values(
+        available_dtypes=helpers.get_dtypes("valid"),
+    ),
+    test_with_out=st.just(False),
+)
+def test_tensorflow_Const(  # NOQA
+    *,
+    dtype_and_x,
+    frontend,
+    test_flags,
+    fn_tree,
+    backend_fw,
+    on_device,
+):
+    dtype, x = dtype_and_x
+    helpers.test_frontend_function(
+        input_dtypes=dtype,
+        backend_to_test=backend_fw,
+        frontend=frontend,
+        test_flags=test_flags,
+        fn_tree=fn_tree,
+        on_device=on_device,
+        value=x[0],
+    )

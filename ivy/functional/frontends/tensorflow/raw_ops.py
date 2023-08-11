@@ -957,3 +957,8 @@ Einsum = to_ivy_arrays_and_back(
         "tensorflow",
     )(map_raw_ops_alias(tf_frontend.general_functions.einsum))
 )
+
+
+@to_ivy_arrays_and_back
+def Const(*, value, dtype, name="Const"):
+    return ivy.constant_pad(value, 0)
